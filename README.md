@@ -17,9 +17,9 @@
 > 3. **The Literature Divergence:** The expected theoretical baseline previously subtracted was derived from the Craig-Ono-Singh (COS) theorem for peelable $t$-hooks (rim hooks), which scales identically to unrestricted partitions at $\frac{\sqrt{6n}}{\pi}$ (originating from a $1/(1-q^2)^2$ double-pole singularity).
 > 
 > **Conclusion:**
-> The subtraction of the unrestricted COS baseline ($\approx 78.0$ at $n=10,000$) from the strictly evaluated distinct-odd statistic ($\approx 54.04$ at $n=10,000$) created an underlying $\ln 2$ scaling divergence. At the extreme small-$n$ limit ($n \le 60$), integer discretization effects within this growing gap perfectly aliased as a trigonometric wave. Modifying the DP engine's inner loop to inject the exact $1/(1-q)^2$ multiplicity pole instantaneously shifts the empirical mean to the expected $\approx 78.0$, closing the gap.
+> The subtraction of the unrestricted COS baseline ($\approx 78.0$ at $n=10,000$) from the strictly evaluated distinct-odd statistic ($\approx 54.04$ at $n=10,000$) created an underlying $\ln 2$ scaling divergence. At the extreme small- $n$ limit ($n \le 60$), integer discretization effects within this growing gap perfectly aliased as a trigonometric wave. Modifying the DP engine's inner loop to inject the exact $1/(1-q)^2$ multiplicity pole instantaneously shifts the empirical mean to the expected $\approx 78.0$, closing the gap.
 > 
-> *This repository is currently being updated to reflect these extended high-$n$ proofs and the corrected generating-function weights.*
+> *This repository is currently being updated to reflect these extended high- $n$ proofs and the corrected generating-function weights.*
 
 
 ## Overview
