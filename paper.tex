@@ -1,0 +1,639 @@
+\documentclass[11pt,reqno]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{microtype}
+\geometry{margin=1in}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Finite-$n$ Convergence and Period-4 Oscillatory Structure\\
+in Hook Statistics of Self-Conjugate Partitions}
+
+\author{Rudra Mishra}
+\address{Independent Researcher}
+\email{}
+\date{June 6, 2026}
+
+\begin{document}
+
+\begin{abstract}
+We present an experimental investigation of the finite-$n$ 
+convergence structure of the Craig--Ono--Singh asymptotic formula 
+for $t$-hook statistics in self-conjugate integer partitions. 
+Craig, Ono, and Singh proved that for fixed $t \geq 1$, the number 
+of $t$-hooks among self-conjugate partitions of $n$ is 
+asymptotically normally distributed with explicit mean 
+$\mu_t(n) \sim \frac{\sqrt{6n}}{\pi} - \frac{t}{2} + 
+\frac{3}{\pi^2} + \frac{\delta_t}{4}$. 
+While their work establishes large-$n$ asymptotics, the 
+finite-$n$ error structure has not been computationally 
+characterized. For $t = 1, 2, 3$ and $3 \leq n \leq 60$, 
+we define the signed error $e(t,n) = \mu_t^{\mathrm{emp}}(n) - 
+\mu_t^{\mathrm{theory}}(n)$. The scaled error $e(t,n)\sqrt{n}$ 
+remains bounded, numerically verifying the theoretical $O(n^{-1/2})$ bound 
+for the tested range. Furthermore, exploratory Fast Fourier transform analysis 
+detects a frequency near $0.25$ (period-4) in the SC error spectrum. This aligns 
+with the expected analytic contributions from subdominant singularities at fourth 
+roots of unity in the generating function. We propose a descriptive empirical 
+ansatz for this period-4 oscillatory structure and outline the necessary statistical 
+and analytic directions required to formalize it for larger $n$.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%---------------------------------------------------------------
+\section{Introduction}
+%---------------------------------------------------------------
+
+The study of integer partitions sits at the crossroads of 
+combinatorics, number theory, and mathematical physics. 
+A partition of a positive integer $n$ is a nonincreasing 
+sequence of positive integers summing to $n$. Among the 
+various combinatorial statistics attached to partitions, 
+hook lengths occupy a distinguished role: they govern the 
+representation theory of symmetric groups via the 
+Frame--Thrall--Robinson hook length formula, appear in the 
+Nekrasov--Okounkov identity, and connect to modular forms 
+through the work of Han.
+
+A partition $\lambda$ is \emph{self-conjugate} if its Young 
+diagram equals its transpose. Self-conjugate partitions are 
+in natural bijection with partitions into distinct odd parts 
+via hook decomposition, a classical fact going back to Euler. 
+Diagonal hooks in self-conjugate partitions are odd, though general 
+hook lengths may be even or odd. This creates a structural 
+constraint that distinguishes them sharply from unrestricted partitions.
+
+Craig, Ono, and Singh~\cite{COS} recently established that 
+the number of $t$-hooks in self-conjugate partitions of $n$ 
+is asymptotically normally distributed, extending earlier 
+work of Griffin, Ono, and Tsai on unrestricted partitions. 
+Their proof uses two-variable generating functions derived 
+via the Littlewood bijection for $t$-core partitions, 
+together with Euler--Maclaurin summation, the dilogarithm 
+function, and the saddle-point method.
+
+\medskip
+
+The present work operates in a different regime. Rather than 
+proving new asymptotic theorems, we conduct an exploratory computational investigation 
+of the finite-$n$ remainder term of the Craig--Ono--Singh formula. 
+Specifically, we ask: how does the empirical mean $\mu_t^{\mathrm{emp}}(n)$ approach 
+$\mu_t^{\mathrm{theory}}(n)$ as $n$ grows?
+
+The Craig--Ono--Singh asymptotic contains an uncharacterized remainder 
+term of order $O(n^{-1/2})$. Consequently, the empirical residual studied 
+here mixes finite-$n$ fluctuations with the unknown higher-order 
+asymptotic correction. 
+
+Our primary empirical observation is the numerical detection of a period-4 
+oscillatory component in the residual for the tested range $n \le 60$. Rather 
+than an unexpected anomaly, this structure is the anticipated analytic consequence 
+of the arithmetic of self-conjugate Young diagrams, specifically arising from 
+singularities at fourth roots of unity in the generating function.
+
+\medskip
+
+\noindent\textbf{Organization.} Section~2 provides background 
+on partitions, Young diagrams, hooks, and the Craig--Ono--Singh 
+theorem. Section~3 describes our computational framework. 
+Section~4 presents experimental observations: scaled error, 
+FFT analysis, mod-4 decomposition, and model fitting. 
+Section~5 compares SC and unrestricted partitions. 
+Section~6 states the empirical model. Section~7 discusses 
+methodological limitations and future directions.
+
+%---------------------------------------------------------------
+\section{Background}
+%---------------------------------------------------------------
+
+\subsection{Partitions and Young diagrams}
+
+A \emph{partition} of $n$ is a sequence 
+$\lambda = (\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_k > 0)$ 
+with $\sum_i \lambda_i = n$. We write $\lambda \vdash n$ and 
+denote the number of partitions of $n$ by $p(n)$.
+
+The \emph{Young diagram} of $\lambda$ is the left-justified 
+array of boxes with $\lambda_i$ boxes in row $i$. The 
+\emph{conjugate partition} $\lambda'$ is obtained by 
+transposing this array.
+
+\subsection{Self-conjugate partitions}
+
+A partition is \emph{self-conjugate} if $\lambda = \lambda'$, 
+i.e., the Young diagram is symmetric across its main diagonal. 
+We denote by $\mathrm{SC}(n)$ the set of self-conjugate 
+partitions of $n$ and by $\mathrm{sc}(n) = |\mathrm{SC}(n)|$ 
+their count.
+
+\begin{observation}[Euler, 1748]
+$\mathrm{sc}(n)$ equals the number of partitions of $n$ into 
+distinct odd parts.
+\end{observation}
+
+This is proved via hook decomposition: the diagonal hooks of 
+a self-conjugate partition have odd lengths, and stripping them 
+yields a bijection with distinct odd part partitions.
+
+\subsection{Hook lengths}
+
+For a box $(i,j)$ in the Young diagram of $\lambda$, the 
+\emph{hook length} is
+\[
+h(i,j) = (\lambda_i - j) + (\lambda'_j - i) + 1.
+\]
+The \emph{hook multiset} $H(\lambda)$ collects all hook 
+lengths in $\lambda$.
+
+For a fixed integer $t \geq 1$, define
+\[
+N_t(\lambda) = \#\{h \in H(\lambda) : h = t\}.
+\]
+
+In self-conjugate partitions, the diagonal hooks are odd; however, 
+general hook lengths can be even or odd.
+
+\subsection{The Craig--Ono--Singh theorem}
+
+The following is the main result of~\cite{COS}.
+
+\begin{theorem}[Craig--Ono--Singh, 2025]\label{thm:COS}
+Let $t \geq 1$ and let $\widehat{N}_{t,n}$ be the random 
+variable giving the distribution of $N_t(\lambda)$ over 
+$\mathrm{SC}(n)$. Then as $n \to \infty$, 
+$\widehat{N}_{t,n}$ is asymptotically normally distributed 
+with mean
+\[
+\mu_t(n) = \frac{\sqrt{6n}}{\pi} - \frac{t}{2} 
++ \frac{3}{\pi^2} + \frac{\delta_t}{4} 
++ O\!\left(\frac{1}{\sqrt{n}}\right)
+\]
+and variance
+\[
+\sigma_t(n)^2 = \frac{(\pi^2 - 6)\sqrt{6n}}{\pi^3} + O(1),
+\]
+where $\delta_t = 1$ if $t$ is odd and $0$ otherwise.
+\end{theorem}
+
+%---------------------------------------------------------------
+\section{Computational Framework}
+%---------------------------------------------------------------
+
+\subsection{Implementation}
+
+All computations were performed in Python on standard hardware. 
+The codebase includes:
+\begin{itemize}
+\item recursive partition generation,
+\item self-conjugacy testing via conjugate comparison,
+\item hook length computation for all boxes,
+\item empirical mean calculation per $n$ and $t$,
+\item FFT analysis via \texttt{numpy.fft},
+\item least-squares model fitting via \texttt{scipy.optimize.curve\_fit},
+\item entropy calculation for hook distributions.
+\end{itemize}
+
+\subsection{Definitions}
+
+Fix $t \geq 1$. For each $n$, define the \emph{empirical mean}
+\[
+\mu_t^{\mathrm{emp}}(n) 
+= \frac{1}{\mathrm{sc}(n)} 
+\sum_{\lambda \in \mathrm{SC}(n)} N_t(\lambda).
+\]
+
+Define the \emph{signed error}
+\[
+e(t,n) = \mu_t^{\mathrm{emp}}(n) - \mu_t^{\mathrm{theory}}(n),
+\]
+where $\mu_t^{\mathrm{theory}}(n)$ is the leading asymptotic 
+from Theorem~\ref{thm:COS}.
+
+For \emph{unrestricted} partitions, the theoretical mean from Griffin--Ono--Tsai~\cite{GOT} is
+\[
+\mu_t^{\mathrm{GOT}}(n) = \frac{\sqrt{6n}}{\pi} - \frac{t}{2} + \frac{3}{\pi^2} + O\!\left(\frac{1}{\sqrt{n}}\right).
+\]
+Note the absence of the $\delta_t/4$ term compared to the self-conjugate case. We define the signed error for unrestricted partitions analogously using $\mu_t^{\mathrm{GOT}}(n)$.
+
+Define the \emph{relative error}
+\[
+R(t,n) = \frac{|e(t,n)|}{|\mu_t^{\mathrm{theory}}(n)|}.
+\]
+
+Define the \emph{scaled error}
+\[
+A(t,n) = e(t,n)\sqrt{n}.
+\]
+
+\subsection{Computational range}
+
+Experiments were run for $t \in \{1, 2, 3\}$ and 
+$3 \leq n \leq 60$. For comparison, unrestricted partition 
+hook statistics were computed over the same range.
+
+Figure~\ref{fig:master} illustrates the growth of $p(n)$, 
+$p_{\mathrm{odd}}(n)$, $p_{\mathrm{distinct}}(n)$, and 
+$\mathrm{sc}(n)$ for $n \leq 20$, empirically confirming Euler's theorem 
+($p_{\mathrm{odd}} = p_{\mathrm{distinct}}$) and the 
+self-conjugate--distinct odd parts bijection.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figure1_partition_sequences.png}
+\caption{Growth of partition sequences. Red and green 
+curves (p\_odd and p\_distinct) are visually identical, 
+empirically confirming Euler's theorem.}
+\label{fig:master}
+\end{figure}
+
+%---------------------------------------------------------------
+\section{Experimental Observations}
+%---------------------------------------------------------------
+
+\subsection{Euler's theorem and Young diagram bijection}
+
+As a verification baseline, Figure~\ref{fig:euler} indicates 
+that empirical mean hook length is consistently lower for 
+self-conjugate partitions than for all partitions of $n$, 
+consistent with the geometric compactness of self-conjugate 
+Young diagrams.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{figure2_hook_stats.png}
+\caption{Mean hook length for all partitions vs.\ 
+self-conjugate partitions. The gap is consistently 
+negative, reflecting the geometric compactness of 
+self-conjugate diagrams.}
+\label{fig:euler}
+\end{figure}
+
+\subsection{Empirical vs.\ asymptotic mean}
+
+Figure~\ref{fig:asymp} illustrates the empirical mean 
+$\mu_t^{\mathrm{emp}}(n)$ alongside the Craig--Ono--Singh 
+asymptotic $\mu_t^{\mathrm{theory}}(n)$ for $t = 1, 2, 3$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figureA_empirical_vs_asymptotic.png}
+\caption{Empirical mean (solid) vs.\ Craig--Ono--Singh 
+asymptotic (dashed) for $t=1,2,3$. Convergence is visible 
+but oscillatory.}
+\label{fig:asymp}
+\end{figure}
+
+Figure~\ref{fig:diff} indicates the signed difference 
+$e(t,n)$ for all three values of $t$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figureB_convergence_diff.png}
+\caption{Signed error $e(t,n)$ for $t=1,2,3$. 
+The error oscillates around zero rather than 
+decaying monotonically.}
+\label{fig:diff}
+\end{figure}
+
+\subsection{Relative error decay}
+
+Figure~\ref{fig:relErr} illustrates $R(t,n)$ for $t=1,2,3$. 
+Even $t$ exhibits a different decay profile than odd $t$. 
+Because the $\delta_t/4$ constant is already subtracted from the 
+theoretical mean, this difference confirms that the remaining 
+higher-order asymptotic terms also depend strongly on the parity of $t$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{lens1_relative_error.png}
+\caption{Relative error $R(t,n)$ and parity-of-$n$ split. 
+Odd $t$ exhibits persistently higher relative error for 
+$n < 30$.}
+\label{fig:relErr}
+\end{figure}
+
+\subsection{Scaled error and decay rate}
+
+Figure~\ref{fig:scaled} indicates the scaled error 
+$A(t,n) = e(t,n)\sqrt{n}$. The quantity remains bounded 
+in the tested range, rather than decaying to zero or growing. This 
+does not constitute a new bound, but successfully verifies the 
+$O(n^{-1/2})$ decay rate established in Theorem~\ref{thm:COS} 
+for the finite regime $n \le 60$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{lens5_scaled_error.png}
+\caption{Scaled error $e(t,n)\sqrt{n}$ for $t=1,2,3$. 
+The quantity is bounded and oscillatory, numerically verifying the 
+theoretical $O(n^{-1/2})$ decay.}
+\label{fig:scaled}
+\end{figure}
+
+Figure~\ref{fig:decay} indicates log $R(t,n)$. The 
+roughly linear downward trend suggests polynomial 
+rather than exponential decay.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{lens4_decay_rate.png}
+\caption{Log relative error. The downward linear trend 
+suggests polynomial decay, not exponential.}
+\label{fig:decay}
+\end{figure}
+
+\subsection{FFT analysis and period-4 structure}
+
+Figure~\ref{fig:fft} illustrates the raw FFT of $e(t,n)$. 
+A dominant peak appears near frequency $0.25$, 
+suggesting a period-4 oscillation. This peak 
+appears to persist after parity averaging (Figure~\ref{fig:fftdecomp}), 
+ruling out pure period-2 (parity) as the sole source. 
+
+It must be noted that the raw signed error contains a non-stationary 
+decaying trend. Applying an FFT to a short sequence of length 58 without 
+detrending or tapering risks spectral leakage. The peak at 0.25 is therefore 
+an exploratory observation; future rigorous analysis on larger datasets must employ 
+proper detrending to formally isolate the periodic signal.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{lens2_signed_fft.png}
+\caption{Left: signed error $e(t,n)$. Right: Raw FFT of 
+$e(t,n)$. The dominant frequency is near $0.25$ 
+(period-4).}
+\label{fig:fft}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{test4_fft_decomposition.png}
+\caption{FFT of raw error, scaled error, and 
+parity-averaged error. The period-4 peak at frequency 
+$0.25$ persists after parity averaging.}
+\label{fig:fftdecomp}
+\end{figure}
+
+\subsection{Mod-4 residue analysis}
+
+Figure~\ref{fig:mod4} separates $e(t,n)$ by residue 
+class of $n$ modulo 4.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{mod4_split.png}
+\caption{Signed error separated by $n \bmod 4$. 
+The four residue classes exhibit distinct behavior 
+for SC partitions.}
+\label{fig:mod4}
+\end{figure}
+
+Table~\ref{tab:mod4} indicates the mean of $A(t,n) = 
+e(t,n)\sqrt{n}$ stratified by $n \bmod 4$, for 
+both SC and unrestricted partitions.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{llrrrr}
+\toprule
+$t$ & Type & $n\equiv 0$ & $n\equiv 1$ & 
+      $n\equiv 2$ & $n\equiv 3$ \\
+\midrule
+1 & SC           & $-0.440$ & $-0.133$ & $\phantom{-}1.296$ & $\phantom{-}0.544$ \\
+1 & Unrestricted & $\phantom{-}1.810$ & $\phantom{-}1.859$ & $\phantom{-}1.826$ & $\phantom{-}1.847$ \\
+\midrule
+2 & SC           & $\phantom{-}1.567$ & $\phantom{-}1.065$ & $-0.775$ & $\phantom{-}0.105$ \\
+2 & Unrestricted & $\phantom{-}2.161$ & $\phantom{-}2.049$ & $\phantom{-}2.168$ & $\phantom{-}2.020$ \\
+\midrule
+3 & SC           & $\phantom{-}0.125$ & $\phantom{-}0.516$ & $\phantom{-}1.862$ & $\phantom{-}1.269$ \\
+3 & Unrestricted & $\phantom{-}2.513$ & $\phantom{-}2.566$ & $\phantom{-}2.564$ & $\phantom{-}2.593$ \\
+\bottomrule
+\end{tabular}
+\caption{Mean of $e(t,n)\sqrt{n}$ by residue class 
+$n \bmod 4$. Given the small sample size per residue class 
+(approx. 15 points), these means lack standard errors and 
+formal ANOVA testing; they are presented as descriptive statistics 
+rather than proven mod-4 effects.}
+\label{tab:mod4}
+\end{table}
+
+\subsection{Oscillatory model fit}
+
+We fit the model
+\[
+e(t,n) \approx 
+\frac{A_t + B_t\cos(\pi n) 
++ C_t\cos(\pi n/2) 
++ D_t\sin(\pi n/2)}{\sqrt{n}}
+\]
+via least squares. Table~\ref{tab:fit} presents fitted 
+constants and RMS residuals. 
+
+\paragraph{Note on model fitting.} This is a saturated, overparameterized fit for a sequence of length 58. Without cross-validation or formal F-tests comparing it to a reduced trend-only model, the constants $C_t, D_t$ risk overfitting. The model serves solely as a descriptive ansatz for $n \le 60$.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{llrrrrr}
+\toprule
+$t$ & Type & $A_t$ & $B_t$ & $C_t$ & $D_t$ & RMS \\
+\midrule
+1 & SC           & $0.390$ & $\phantom{-}0.245$ & $-1.171$ & $-0.416$ & $0.213$ \\
+1 & Unrestricted & $1.402$ & $-0.030$ & $-0.067$ & $\phantom{-}0.079$ & $0.123$ \\
+2 & SC           & $0.400$ & $-0.210$ & $\phantom{-}1.651$ & $\phantom{-}0.768$ & $0.197$ \\
+2 & Unrestricted & $1.628$ & $\phantom{-}0.168$ & $-0.048$ & $\phantom{-}0.126$ & $0.137$ \\
+3 & SC           & $0.895$ & $\phantom{-}0.175$ & $-1.075$ & $-0.556$ & $0.277$ \\
+3 & Unrestricted & $2.102$ & $-0.058$ & $-0.140$ & $-0.031$ & $0.134$ \\
+\bottomrule
+\end{tabular}
+\caption{Fitted constants for the descriptive oscillatory 
+model for $n \le 60$.}
+\label{tab:fit}
+\end{table}
+
+Figure~\ref{fig:fit} illustrates the model fit overlaid 
+on the empirical error.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{oscillatory_fit.png}
+\caption{Empirical error (solid) and fitted 
+oscillatory ansatz (dashed) for $t=1,2,3$.}
+\label{fig:fit}
+\end{figure}
+
+%---------------------------------------------------------------
+\section{Comparison: SC vs.\ Unrestricted Partitions}
+%---------------------------------------------------------------
+
+Figures~\ref{fig:comp1}--\ref{fig:comp3} present the 
+direct comparison between SC and unrestricted partitions.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{comp1_signed_error.png}
+\caption{Signed error for SC (solid) vs.\ 
+unrestricted (dashed) partitions.}
+\label{fig:comp1}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{comp2_scaled_error.png}
+\caption{Scaled error $e(t,n)\sqrt{n}$ for SC 
+vs.\ unrestricted. The unrestricted scaled error 
+drifts upward.}
+\label{fig:comp2}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{comp3_fft.png}
+\caption{FFT comparison. SC partitions (solid) 
+exhibit a peak near frequency $0.25$. 
+Unrestricted partitions (dashed) exhibit a nearly 
+flat spectrum.}
+\label{fig:comp3}
+\end{figure}
+
+The contrast in Table~\ref{tab:mod4} is sharp, but requires careful interpretation. 
+The unrestricted asymptotic mean used here is only a leading term; the actual error 
+in the unrestricted case is known to be $O(1)$, not $O(n^{-1/2})$. The observed upward drift 
+of the unrestricted scaled error (Figure~\ref{fig:comp2}) is exactly this $O(1)$ 
+offset being multiplied by $\sqrt{n}$. Because this dominant non-oscillatory offset masks 
+finer structure, the absence of a period-4 peak in unrestricted partitions should be interpreted 
+cautiously. To make the comparison fully meaningful in future work, the $O(1)$ constant 
+must be extracted from the unrestricted asymptotic before raw periodicities are compared.
+
+%---------------------------------------------------------------
+\section{Empirical Model}
+%---------------------------------------------------------------
+
+The experimental evidence motivates the following empirical fit.
+
+\begin{observation}\label{obs:main}
+Let $t \geq 1$ be fixed. Least-squares fitting suggests the descriptive empirical 
+ansatz for the signed error $e(t,n) = \mu_t^{\mathrm{emp}}(n) - \mu_t^{\mathrm{theory}}(n)$ 
+for self-conjugate partitions in the tested range $n \le 60$:
+\[
+e(t,n)\sqrt{n} \approx A_t + B_t(-1)^n 
++ C_t\cos\!\left(\frac{\pi n}{2}\right) 
++ D_t\sin\!\left(\frac{\pi n}{2}\right) 
+\]
+for real constants $A_t, B_t, C_t, D_t$ depending only on $t$. 
+\end{observation}
+
+\begin{remark}
+The period-4 terms $\cos(\pi n/2)$ and $\sin(\pi n/2)$ 
+take the four values $(1,0,-1,0)$ and $(0,1,0,-1)$ on 
+residue classes $n \equiv 0,1,2,3 \pmod{4}$ respectively, 
+naturally producing the mod-4 amplitude structure observed 
+in Table~\ref{tab:mod4}.
+\end{remark}
+
+\begin{remark}
+Rather than a purely unexpected discovery, the period-4 signal is an anticipated 
+analytic feature. The generating function for self-conjugate partitions involves 
+products of the form $(-q;q^2)_\infty$. When expanded near fourth roots 
+of unity, the subdominant singularities at $q = \pm i$ naturally give rise 
+to terms involving $\cos(\pi n/2)$ and $\sin(\pi n/2)$ via the circle method. 
+Our numerical data serves to verify the presence of these expected subdominant 
+contributions. The empirical model assumes constant amplitudes $C_t, D_t$ in the scaled error, 
+which serves as a descriptive ansatz for this finite range, though the true 
+asymptotic amplitudes may exhibit slight $n$-dependence.
+\end{remark}
+
+%---------------------------------------------------------------
+\section{Discussion and Future Directions}
+%---------------------------------------------------------------
+
+\subsection{Summary of findings}
+
+\begin{enumerate}
+\item The scaled error $e(t,n)\sqrt{n}$ remains bounded, 
+numerically verifying the $O(n^{-1/2})$ error bound established by 
+Craig--Ono--Singh for the tested range $n \le 60$.
+
+\item Exploratory FFT analysis and mod-4 residue decomposition 
+detect a period-4 oscillatory component in the finite-$n$ residual.
+
+\item This period-4 structure aligns with the analytic contributions 
+expected from subdominant singularities at fourth roots of unity in the 
+generating function.
+
+\item Even $t$ empirically observes a different decay profile 
+than odd $t$, confirming that higher-order asymptotic terms 
+depend strongly on parity.
+\end{enumerate}
+
+\subsection{Limitations \& Future directions}
+
+These results are purely computational and exploratory. 
+The range $n \leq 60$ is modest, and the statistical fitting risks 
+overparameterization. To advance this exploratory note into rigorous 
+asymptotic theory, the following steps are necessary:
+
+\begin{itemize}
+\item \textbf{Larger computational range.} Extend computations 
+to $n \geq 10^3$ using optimized partition generation via the distinct 
+odd parts bijection to verify if the periodic amplitudes stabilize.
+
+\item \textbf{Rigorous Statistical Testing.} Re-evaluate the FFT using 
+proper detrending and windowing to avoid non-stationary spectral leakage, 
+and apply formal ANOVA testing to the residue classes.
+
+\item \textbf{Theoretical derivation.} Extract the exact next term in the 
+asymptotic expansion using the circle method near $q = \pm i$, and compare the 
+predicted oscillatory coefficients directly with the empirical ones.
+
+\item \textbf{Refined Unrestricted Comparison.} Extract the $O(1)$ constant from the 
+unrestricted asymptotic to allow for an unbiased comparison of periodic residuals 
+between SC and unrestricted partitions.
+\end{itemize}
+
+%---------------------------------------------------------------
+\section*{Acknowledgements}
+%---------------------------------------------------------------
+
+The author thanks the computational tools Python, NumPy, 
+SciPy, and Matplotlib. This work was conducted 
+independently as an exploratory research project.
+
+%---------------------------------------------------------------
+\begin{thebibliography}{9}
+%---------------------------------------------------------------
+
+\bibitem{COS}
+W.~Craig, K.~Ono, and A.~Singh,
+\textit{Distribution of hooks in self-conjugate partitions},
+Discrete Math.\ \textbf{348} (2025).
+\href{https://arxiv.org/abs/2406.09059}{arXiv:2406.09059}
+
+\bibitem{AAOS}
+T.~Amdeberhan, G.~E.~Andrews, K.~Ono, and A.~Singh,
+\textit{Hook lengths in self-conjugate partitions},
+Proc.\ Amer.\ Math.\ Soc.\ Ser.\ B \textbf{11} (2024), 345--357.
+
+\bibitem{GOT}
+M.~Griffin, K.~Ono, and W.-L.~Tsai,
+\textit{Distributions of hook lengths in integer partitions},
+Proc.\ Amer.\ Math.\ Soc., to appear.
+
+\bibitem{Euler}
+L.~Euler,
+\textit{Introductio in analysin infinitorum},
+1748.
+
+\end{thebibliography}
+
+\end{document}
