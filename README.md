@@ -11,8 +11,8 @@
 > **Recent Findings (Scaling to $n=10,000$):**
 > Initial exploratory computations in this repository tracked data up to $n \le 60$, identifying what appeared to be a stable $O(n^{-1/2})$ period-4 oscillatory structure in the residual error. To rigorously test this hypothesis, a custom $O(n^2)$ dynamic programming algorithm was developed to bypass recursive memory limits, scaling the exact computations to $n=10,000$.
 > 
-> The high-$n$ data cleanly resolves the nature of the oscillation:
-> 1. **Finite-$n$ Transient Artifact:** Pushing the computation to $n=10,000$ proves that the period-4 wave (characterized by constants $C_1 \cos(\pi n / 2) + D_1 \sin(\pi n / 2)$) flattens to $< 3 \times 10^{-5}$. It is not a persistent asymptotic feature, but a deterministic finite-size transient.
+> The high- $n$ data cleanly resolves the nature of the oscillation:
+> 1. **Finite- $n$ Transient Artifact:** Pushing the computation to $n=10,000$ proves that the period-4 wave (characterized by constants $C_1 \cos(\pi n / 2) + D_1 \sin(\pi n / 2)$) flattens to $< 3 \times 10^{-5}$. It is not a persistent asymptotic feature, but a deterministic finite-size transient.
 > 2. **Combinatorial Baseline Shift:** The root cause of the residual wave was isolated to an asymptotic scaling mismatch. The computational engine correctly mapped the *distinct-odd parts* bijection, tracking a bounded statistic whose mathematically rigorous main asymptotic term is $\frac{\ln 2}{\pi}\sqrt{6n}$.
 > 3. **The Literature Divergence:** The expected theoretical baseline previously subtracted was derived from the Craig-Ono-Singh (COS) theorem for peelable $t$-hooks (rim hooks), which scales identically to unrestricted partitions at $\frac{\sqrt{6n}}{\pi}$ (originating from a $1/(1-q^2)^2$ double-pole singularity).
 > 
