@@ -4,7 +4,7 @@
 
 ---
 
-> ⚠️ **RESEARCH UPDATE (IN DEVELOPMENT): High-$n$ Computational Scaling & Asymptotic Resolution**
+> ⚠️ **RESEARCH UPDATE (IN DEVELOPMENT): High- $n$ Computational Scaling & Asymptotic Resolution**
 > 
 > **Status:** Active Investigation / Work in Progress
 > 
